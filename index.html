@@ -15,8 +15,33 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: radial-gradient(ellipse at center, #06061a 0%, #000010 100%);
+  background: radial-gradient(ellipse at center, #0b0b25 0%, #000010 100%);
   position: relative;
+}
+
+/* звезды */
+.stars {
+  position: absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #7ab6ff;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: twinkle 2s infinite alternate;
+}
+@keyframes twinkle {
+  0% {opacity: 0.2;}
+  50% {opacity: 1;}
+  100% {opacity: 0.2;}
 }
 
 .video-container {
@@ -34,6 +59,7 @@ video#bg {
   display: block;
   border-radius: 12px;
   background: black;
+  box-shadow: 0 0 40px rgba(80, 80, 255, 0.3);
 }
 
 .portal-button {
@@ -63,30 +89,28 @@ video#bg {
   background: rgba(150,0,255,1);
 }
 
-/* Мерцающие звёзды */
-.stars {
+/* Кнопка включения звука */
+.sound-btn {
   position: absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  pointer-events: none;
-  z-index: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 50, 0.7);
+  color: #fff;
+  padding: 14px 32px;
+  font-size: 22px;
+  border: 2px solid #7ab6ff;
+  border-radius: 10px;
+  cursor: pointer;
+  z-index: 4;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
 }
-.star {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: #7ab6ff;
-  border-radius: 50%;
-  opacity: 0.8;
-  animation: twinkle 2s infinite alternate;
+.sound-btn:hover {
+  background: rgba(20, 20, 80, 0.9);
+  transform: translate(-50%, -50%) scale(1.05);
 }
-@keyframes twinkle {
-  0% {opacity: 0.2;}
-  50% {opacity: 1;}
-  100% {opacity: 0.2;}
-}
+.hidden { display: none; }
 </style>
 </head>
 <body>
@@ -94,10 +118,11 @@ video#bg {
 <div class="stars" id="stars"></div>
 
 <div class="video-container">
-  <video id="bg" muted preload="auto" controlslist="nodownload nofullscreen noremoteplayback">
+  <video id="bg" preload="auto">
     <source src="./5197261481606939449.mp4" type="video/mp4">
     Ваш браузер не поддерживает видео.
   </video>
+  <button id="soundBtn" class="sound-btn hidden">🔊 Включить звук</button>
   <a class="portal-button" id="portalBtn" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
     Войти в портал
   </a>
@@ -106,10 +131,11 @@ video#bg {
 <script>
 (function(){
   const video = document.getElementById('bg');
+  const soundBtn = document.getElementById('soundBtn');
   const portalBtn = document.getElementById('portalBtn');
   const starsContainer = document.getElementById('stars');
 
-  // Создаем звезды
+  // создаем звезды
   function createStars(count=60){
     for(let i=0;i<count;i++){
       const star = document.createElement('div');
@@ -123,27 +149,35 @@ video#bg {
   }
   createStars();
 
-  // Полностью убираем любые субтитры
+  // отключаем субтитры
   Array.from(video.querySelectorAll('track')).forEach(t => t.remove());
   video.textTracks && Array.from(video.textTracks).forEach(track => track.mode = 'disabled');
 
-  // Включаем звук по первому клику
-  function enableSound() {
-    video.muted = false;
-    video.play().catch(()=>{});
-    document.body.removeEventListener('click', enableSound);
-    document.body.removeEventListener('touchstart', enableSound);
-  }
-  document.body.addEventListener('click', enableSound, {once:true, passive:true});
-  document.body.addEventListener('touchstart', enableSound, {once:true, passive:true});
-
-  // Ограничиваем длину видео до 13 секунд
-  video.addEventListener('play', ()=>{
+  // ограничиваем длину видео
+  function stopVideoAfter13s() {
     setTimeout(()=>{
       video.pause();
       video.currentTime = 0;
       portalBtn.classList.add('show');
     }, 13000);
+  }
+
+  // пробуем запустить звук сразу
+  video.muted = false;
+  video.play().then(()=>{
+    stopVideoAfter13s();
+  }).catch(()=>{
+    // если звук не разрешен — показываем кнопку
+    soundBtn.classList.remove('hidden');
+  });
+
+  // включаем звук вручную
+  soundBtn.addEventListener('click', ()=>{
+    video.muted = false;
+    video.play().then(()=>{
+      soundBtn.classList.add('hidden');
+      stopVideoAfter13s();
+    });
   });
 })();
 </script>
