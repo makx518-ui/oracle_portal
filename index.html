@@ -1,138 +1,135 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Оракул Снов — Вход в Портал</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Оракул Снов — Вход</title>
 <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden;
-    background: radial-gradient(ellipse at center, #030314 0%, #000 100%);
-    font-family: 'Segoe UI', sans-serif;
-    color: white;
-  }
+  :root{--btn:#6f3cff;--btnHover:#9a6bff}
+  html,body{height:100%;margin:0;background:radial-gradient(circle at 30% 10%, #07102a 0%, #000014 60%);font-family:Segoe UI,Roboto,Arial,sans-serif;color:#fff;overflow:hidden}
+  /* звезды фон */
+  #stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .star{position:absolute;background:#7ab6ff;border-radius:50%;opacity:.85;filter:blur(.2px);animation:tw 1.6s infinite alternate}
+  @keyframes tw{0%{opacity:.2}50%{opacity:1}100%{opacity:.2}}
 
-  #stars {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    overflow: hidden;
-    z-index: 0;
-  }
+  /* видео — НЕ трогаем кадр: сохраняем прежний размер, object-fit:contain */
+  .wrap{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;height:100%}
+  video#bg{max-width:85vw;max-height:78vh;border-radius:12px;object-fit:contain;display:block;background:#000;box-shadow:0 10px 60px rgba(20,20,80,.45)}
 
-  .star {
-    position: absolute;
-    background: white;
-    border-radius: 50%;
-    opacity: 0.8;
-    animation: blink 2s infinite ease-in-out;
-  }
+  /* кнопка портала — сверху всех, скрыта до показа */
+  #portalBtn{position:fixed;left:50%;transform:translateX(-50%);bottom:6%;z-index:40;padding:12px 30px;border-radius:12px;border:none;background:var(--btn);color:#fff;font-size:18px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .8s, transform .3s}
+  #portalBtn.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+  #portalBtn:hover{background:var(--btnHover)}
 
-  @keyframes blink {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 1; }
-  }
-
-  video {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    max-width: 80%;
-    max-height: 80%;
-    border-radius: 20px;
-    z-index: 2;
-    background: black;
-  }
-
-  #portalBtn {
-    position: absolute;
-    bottom: 8%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 12px 30px;
-    background: rgba(100,0,255,0.8);
-    border: none;
-    border-radius: 30px;
-    color: white;
-    font-size: 1.2em;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-    z-index: 3;
-  }
-
-  #portalBtn.show {
-    opacity: 1;
-  }
+  /* кнопка включить звук — появится только если браузер блокирует автомат. */
+  #soundBtn{position:fixed;left:50%;top:48%;transform:translate(-50%,-50%);z-index:45;padding:12px 26px;border-radius:10px;border:2px solid rgba(122,182,255,.25);background:rgba(3,10,30,.7);color:#7ab6ff;font-size:18px;cursor:pointer;backdrop-filter:blur(4px)}
+  #soundBtn.hidden{display:none}
 </style>
 </head>
 <body>
 
 <div id="stars"></div>
 
-<video id="bg" playsinline preload="auto">
-  <source src="./5197261481606939449.mp4" type="video/mp4">
-</video>
+<div class="wrap">
+  <video id="bg" playsinline preload="auto" crossorigin="anonymous">
+    <source src="./5197261481606939449.mp4" type="video/mp4">
+    Ваш браузер не поддерживает видео.
+  </video>
+</div>
 
-<a id="portalBtn" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
-  Войти в Портал
-</a>
+<!-- портал — обычная ссылка, нажимает на неё пользователь после показа -->
+<a id="portalBtn" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">Войти в портал</a>
+
+<!-- звук — только если автозапуск со звуком заблокирован -->
+<button id="soundBtn" class="hidden">🔊 Включить звук</button>
 
 <script>
 (function(){
   const video = document.getElementById('bg');
   const portalBtn = document.getElementById('portalBtn');
-  const starsContainer = document.getElementById('stars');
+  const soundBtn = document.getElementById('soundBtn');
+  const stars = document.getElementById('stars');
 
-  // создаём мерцающие звёзды
-  for(let i=0;i<60;i++){
-    const star = document.createElement('div');
-    star.className = 'star';
-    star.style.left = Math.random()*100 + '%';
-    star.style.top = Math.random()*100 + '%';
-    const size = 1 + Math.random()*2;
-    star.style.width = size + 'px';
-    star.style.height = size + 'px';
-    star.style.animationDuration = (1 + Math.random()*2) + 's';
-    starsContainer.appendChild(star);
+  /* === 1) генерация звёзд (фон) === */
+  (function makeStars(n=60){
+    for(let i=0;i<n;i++){
+      const s = document.createElement('div');
+      s.className='star';
+      const size = 1 + Math.random()*2.5;
+      s.style.width = s.style.height = size+'px';
+      s.style.left = (Math.random()*100)+'%';
+      s.style.top = (Math.random()*100)+'%';
+      s.style.animationDuration = (0.8 + Math.random()*1.6)+'s';
+      stars.appendChild(s);
+    }
+  })();
+
+  /* === 2) гарантированное отключение любых текстовых дорожек === */
+  function disableTracksOnce(){
+    // удалить <track> элементы, если какие-то были добавлены
+    document.querySelectorAll('video track').forEach(t=>t.remove());
+    // отключить textTracks (если браузер создал)
+    try{
+      if(video.textTracks){
+        for(let i=0;i<video.textTracks.length;i++){
+          try{ video.textTracks[i].mode = 'disabled'; }catch(e){}
+        }
+      }
+    }catch(e){}
+  }
+  // делаем сразу и периодически — это убирает автоподхват в Chrome
+  disableTracksOnce();
+  const disableInterval = setInterval(disableTracksOnce, 300);
+
+  /* === 3) Поведение воспроизведения и звука === */
+  let stopTimer = null;
+  function scheduleStop13(){
+    // очистим старые таймеры
+    if(stopTimer) { clearTimeout(stopTimer); stopTimer=null; }
+    stopTimer = setTimeout(()=>{
+      try{ video.pause(); video.currentTime = 0; }catch(e){}
+      portalBtn.classList.add('show');
+    }, 13000); // 13s
   }
 
-  // Удаляем все возможные дорожки субтитров
-  const removeTracks = () => {
-    const tracks = video.querySelectorAll('track');
-    tracks.forEach(t => t.remove());
-    if(video.textTracks) {
-      for(let i=0; i<video.textTracks.length; i++) {
-        video.textTracks[i].mode = 'disabled';
-      }
-    }
-  };
-  removeTracks();
-
-  // Включаем звук после клика
-  const enableSound = () => {
-    video.muted = false;
-    video.play();
-    document.body.removeEventListener('click', enableSound);
-  };
-  document.body.addEventListener('click', enableSound);
-
-  // Стартуем видео
+  // Пробуем запустить со звуком сразу
   video.muted = false;
-  video.play().catch(()=>{});
+  video.play().then(()=>{
+    scheduleStop13();
+  }).catch((err)=>{
+    // браузер заблокировал автоплей со звуком — покажем кнопку включить звук
+    soundBtn.classList.remove('hidden');
+    // но всё равно попытаемся автозапустить в режиме muted, чтобы пользователь видел картинку
+    video.muted = true;
+    video.play().catch(()=>{});
+    // и запланируем остановку по кадру времени (если оно играет)
+    scheduleStop13();
+  });
 
-  // Останавливаем через 13 секунд
-  setTimeout(()=>{
-    video.pause();
-    video.currentTime = 0;
+  // Если пользователь нажмёт кнопку звука — включаем звук и продолжаем
+  soundBtn.addEventListener('click', ()=>{
+    soundBtn.classList.add('hidden');
+    video.muted = false;
+    video.play().then(()=> scheduleStop13()).catch(()=> scheduleStop13());
+  });
+
+  // Если браузер сгенерировал событие 'ended', показываем кнопку (доп. страховка)
+  video.addEventListener('ended', ()=>{
     portalBtn.classList.add('show');
-  },13000);
+    if(stopTimer){ clearTimeout(stopTimer); stopTimer = null; }
+  });
+
+  // дополнительно отключаем дорожки при любом изменении
+  video.addEventListener('loadedmetadata', disableTracksOnce);
+  video.addEventListener('loadeddata', disableTracksOnce);
+  video.addEventListener('play', disableTracksOnce);
+
+  // Когда всё готово и пользователь кликает по порталу — работаем как ссылка (никаких JS-преград)
+  portalBtn.addEventListener('click', ()=>{/* ничего — просто открывает ссылку */});
+
+  // Удаляем интервал отключения после минуты (чтобы не держать в памяти)
+  setTimeout(()=>{ clearInterval(disableInterval); }, 60000);
 })();
 </script>
-
 </body>
 </html>
