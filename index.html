@@ -12,42 +12,53 @@ html, body {
   width: 100%;
   overflow: hidden;
   font-family: 'Segoe UI', sans-serif;
-  background: #000;
   display: flex;
   justify-content: center;
   align-items: center;
+  background: #0a0a1a; /* темно-синяя основа */
 }
 
-/* Анимированный фон (звезды + плавное мерцание) */
+/* Фон с градиентом и звездами */
 body::before {
   content: '';
   position: absolute;
   top:0; left:0; right:0; bottom:0;
-  background: radial-gradient(circle at center, #0a0a0a, #000);
+  background: linear-gradient(to bottom, #0a0a1a 0%, #000022 100%);
   z-index: 0;
-  animation: pulse 8s infinite alternate;
 }
-@keyframes pulse {
-  0% { background: radial-gradient(circle at center, #0a0a0a, #000); }
-  50% { background: radial-gradient(circle at center, #1a0a30, #000); }
-  100% { background: radial-gradient(circle at center, #0a0a0a, #000); }
+
+.stars {
+  position: absolute;
+  top:0; left:0; width:100%; height:100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: twinkle 2s infinite alternate;
+}
+@keyframes twinkle {
+  0% {opacity: 0.2;}
+  50% {opacity: 1;}
+  100% {opacity: 0.2;}
 }
 
 .video-container {
   position: relative;
-  width: 80%;
-  max-width: 960px;
-  aspect-ratio: 16/9;
-  border-radius: 12px;
-  overflow: hidden;
-  z-index: 1;
+  z-index: 2; /* поверх фона и звезд */
 }
 
 video#bg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
   display: block;
+  width: auto;
+  max-width: 90vw;
+  max-height: 80vh;
   border-radius: 12px;
 }
 
@@ -64,7 +75,7 @@ video#bg {
   border-radius: 12px;
   border: 2px solid rgba(255,255,255,0.1);
   cursor: pointer;
-  z-index: 2;
+  z-index: 3;
   opacity: 0;
   pointer-events: none;
   transition: opacity 1.2s ease, transform 0.4s ease;
@@ -78,25 +89,14 @@ video#bg {
   background: rgba(150,0,255,1);
   transform: translateX(-50%) translateY(-3px) scale(1.05);
 }
-
-.message {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 3;
-  background: rgba(0,0,0,0.5);
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  color: #fff;
-}
 </style>
 </head>
 <body>
 
+<div class="stars" id="stars"></div>
+
 <div class="video-container">
-  <video id="bg" playsinline preload="auto">
+  <video id="bg" muted>
     <source src="./5197261481606939449.mp4" type="video/mp4">
     Ваш браузер не поддерживает видео.
   </video>
@@ -106,40 +106,39 @@ video#bg {
   </a>
 </div>
 
-<div id="msg" class="message"></div>
-
 <script>
 (function(){
   const video = document.getElementById('bg');
   const portalBtn = document.getElementById('portalBtn');
-  const msg = document.getElementById('msg');
+  const starsContainer = document.getElementById('stars');
 
-  function showMessage(text, timeout=4000) {
-    msg.textContent = text;
-    msg.style.display = 'block';
-    if(timeout>0) setTimeout(()=>msg.style.display='none', timeout);
+  // Создаем случайные звезды
+  function createStars(count=50){
+    for(let i=0;i<count;i++){
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random()*100 + '%';
+      star.style.top = Math.random()*100 + '%';
+      star.style.width = star.style.height = (1 + Math.random()*2) + 'px';
+      star.style.animationDuration = (1 + Math.random()*2) + 's';
+      starsContainer.appendChild(star);
+    }
   }
+  createStars();
 
-  // Включаем звук при первом клике
-  function enableVideoWithSound() {
+  // Видео играет один раз, звук по клику
+  function enableVideo() {
     video.muted = false;
     video.play().catch(()=>{});
-    showMessage('Видео запущено со звуком', 3000);
-    document.body.removeEventListener('click', enableVideoWithSound);
-    document.body.removeEventListener('touchstart', enableVideoWithSound);
+    document.body.removeEventListener('click', enableVideo);
+    document.body.removeEventListener('touchstart', enableVideo);
   }
+  document.body.addEventListener('click', enableVideo, {once:true, passive:true});
+  document.body.addEventListener('touchstart', enableVideo, {once:true, passive:true});
 
-  document.body.addEventListener('click', enableVideoWithSound, {once:true, passive:true});
-  document.body.addEventListener('touchstart', enableVideoWithSound, {once:true, passive:true});
-
-  // После окончания видео
+  // После окончания видео показываем кнопку
   video.addEventListener('ended', ()=>{
-    portalBtn.classList.add('show'); // показываем кнопку
-    showMessage('Нажмите кнопку, чтобы войти в портал', 5000);
-  });
-
-  window.addEventListener('load', ()=> {
-    showMessage('Нажмите один раз по экрану для запуска видео со звуком', 5000);
+    portalBtn.classList.add('show');
   });
 })();
 </script>
