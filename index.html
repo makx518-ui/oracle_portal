@@ -5,114 +5,92 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Оракул Снов — Вход</title>
 <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-    background: black;
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    position: relative;
-  }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: 'Segoe UI', sans-serif;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  /* Контейнер видео */
-  .video-container {
-    position: relative;
-    width: 90%;
-    max-width: 960px;
-    aspect-ratio: 16/9;
-    overflow: hidden;
-    border-radius: 12px;
-  }
+/* Анимированный фон (звезды + плавное мерцание) */
+body::before {
+  content: '';
+  position: absolute;
+  top:0; left:0; right:0; bottom:0;
+  background: radial-gradient(circle at center, #0a0a0a, #000);
+  z-index: 0;
+  animation: pulse 8s infinite alternate;
+}
+@keyframes pulse {
+  0% { background: radial-gradient(circle at center, #0a0a0a, #000); }
+  50% { background: radial-gradient(circle at center, #1a0a30, #000); }
+  100% { background: radial-gradient(circle at center, #0a0a0a, #000); }
+}
 
-  video#bg {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    border-radius: 12px;
-  }
+.video-container {
+  position: relative;
+  width: 80%;
+  max-width: 960px;
+  aspect-ratio: 16/9;
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 1;
+}
 
-  /* Субтитры */
-  .subtitle {
-    position: absolute;
-    bottom: 10%;
-    width: 100%;
-    text-align: center;
-    color: #fff;
-    font-size: 18px;
-    text-shadow: 2px 2px 6px black;
-    z-index: 2;
-  }
+video#bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 12px;
+}
 
-  /* Кнопка */
-  .portal-button {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 14px 40px;
-    font-size: 20px;
-    text-decoration: none;
-    color: #fff;
-    background: rgba(100,0,200,0.9);
-    border-radius: 12px;
-    border: 2px solid rgba(255,255,255,0.1);
-    cursor: pointer;
-    z-index: 3;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 1.2s ease, transform 0.4s ease;
-  }
-  .portal-button.show {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateX(-50%) translateY(0);
-  }
-  .portal-button:hover {
-    background: rgba(150,0,255,1);
-    transform: translateX(-50%) translateY(-3px) scale(1.05);
-  }
+.portal-button {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 40px;
+  font-size: 20px;
+  text-decoration: none;
+  color: #fff;
+  background: rgba(100,0,200,0.9);
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease, transform 0.4s ease;
+}
+.portal-button.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+.portal-button:hover {
+  background: rgba(150,0,255,1);
+  transform: translateX(-50%) translateY(-3px) scale(1.05);
+}
 
-  /* Мистические звезды */
-  .stars {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 1;
-  }
-  .star {
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    background: white;
-    border-radius: 50%;
-    opacity: 0.8;
-    animation: twinkle 2s infinite alternate;
-  }
-  @keyframes twinkle {
-    0% {opacity: 0.2;}
-    50% {opacity: 1;}
-    100% {opacity: 0.2;}
-  }
-
-  .message {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 4;
-    background: rgba(0,0,0,0.5);
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 13px;
-    color: #fff;
-  }
+.message {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  background: rgba(0,0,0,0.5);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #fff;
+}
 </style>
 </head>
 <body>
@@ -123,12 +101,9 @@
     Ваш браузер не поддерживает видео.
   </video>
 
-  <div class="subtitle" id="subtitle">Смотрим сны…</div>
   <a id="portalBtn" class="portal-button" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
     Войти в портал
   </a>
-
-  <div class="stars" id="stars"></div>
 </div>
 
 <div id="msg" class="message"></div>
@@ -137,23 +112,7 @@
 (function(){
   const video = document.getElementById('bg');
   const portalBtn = document.getElementById('portalBtn');
-  const subtitle = document.getElementById('subtitle');
   const msg = document.getElementById('msg');
-  const starsContainer = document.getElementById('stars');
-
-  // Создание звезд
-  function createStars(count=50){
-    for(let i=0;i<count;i++){
-      const star = document.createElement('div');
-      star.className = 'star';
-      star.style.left = Math.random()*100 + '%';
-      star.style.top = Math.random()*100 + '%';
-      star.style.width = star.style.height = (1 + Math.random()*2) + 'px';
-      star.style.animationDuration = (1 + Math.random()*2) + 's';
-      starsContainer.appendChild(star);
-    }
-  }
-  createStars();
 
   function showMessage(text, timeout=4000) {
     msg.textContent = text;
@@ -175,8 +134,7 @@
 
   // После окончания видео
   video.addEventListener('ended', ()=>{
-    subtitle.style.display = 'none';
-    portalBtn.classList.add('show'); // плавно проявляем кнопку
+    portalBtn.classList.add('show'); // показываем кнопку
     showMessage('Нажмите кнопку, чтобы войти в портал', 5000);
   });
 
