@@ -5,109 +5,146 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Оракул Снов — Вход</title>
 <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-    background: black;
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-  }
-  .video-container {
-    position: relative;
-    width: 80%;  /* уменьшаем видео */
-    max-width: 960px; /* максимальный размер */
-    aspect-ratio: 16/9; /* сохраняем соотношение */
-  }
-  video#bg {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-    border-radius: 12px;
-    background: black;
-  }
-  .portal-button {
-    position: absolute;
-    bottom: -60px; /* кнопка снизу под видео */
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 14px 40px;
-    font-size: 20px;
-    text-decoration: none;
-    color: #fff;
-    background: rgba(100,0,200,0.9);
-    border-radius: 12px;
-    border: 2px solid rgba(255,255,255,0.08);
-    cursor: pointer;
-    z-index: 2;
-    transition: transform 0.16s ease, background 0.12s ease;
-  }
-  .portal-button:hover {
-    transform: translateX(-50%) translateY(-3px);
-    background: rgba(150,0,255,1);
-  }
-  .message {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 3;
-    background: rgba(0,0,0,0.5);
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 13px;
-    color: #fff;
-  }
-  .hidden { display: none; }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0a0a1a; /* темно-синий фон */
+  position: relative;
+}
+
+/* Контейнер видео */
+.video-container {
+  position: relative;
+  width: 80%;
+  max-width: 960px;
+  aspect-ratio: 16/9;
+  z-index: 2;
+}
+
+/* Видео */
+video#bg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: 12px;
+  background: black;
+}
+
+/* Кнопка */
+.portal-button {
+  position: absolute;
+  bottom: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 40px;
+  font-size: 20px;
+  text-decoration: none;
+  color: #fff;
+  background: rgba(100,0,200,0.9);
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.16s ease, background 0.12s ease, opacity 1s ease;
+}
+.portal-button.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.portal-button:hover {
+  transform: translateX(-50%) translateY(-3px);
+  background: rgba(150,0,255,1);
+}
+
+/* Звезды на фоне */
+.stars {
+  position: absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: twinkle 2s infinite alternate;
+}
+@keyframes twinkle {
+  0% {opacity: 0.2;}
+  50% {opacity: 1;}
+  100% {opacity: 0.2;}
+}
 </style>
 </head>
 <body>
 
+<div class="stars" id="stars"></div>
+
 <div class="video-container">
-  <video id="bg" playsinline loop preload="auto">
+  <video id="bg" muted>
     <source src="./5197261481606939449.mp4" type="video/mp4">
     Ваш браузер не поддерживает видео.
   </video>
-  <a class="portal-button" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
+  <a class="portal-button" id="portalBtn" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
     Войти в портал
   </a>
 </div>
 
-<div id="msg" class="message hidden"></div>
-
 <script>
 (function(){
   const video = document.getElementById('bg');
-  const msg = document.getElementById('msg');
+  const portalBtn = document.getElementById('portalBtn');
+  const starsContainer = document.getElementById('stars');
 
-  function showMessage(text, timeout=4000) {
-    msg.textContent = text;
-    msg.classList.remove('hidden');
-    if(timeout>0) setTimeout(()=>msg.classList.add('hidden'), timeout);
+  // Создаем случайные звезды
+  function createStars(count=50){
+    for(let i=0;i<count;i++){
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random()*100 + '%';
+      star.style.top = Math.random()*100 + '%';
+      star.style.width = star.style.height = (1 + Math.random()*2) + 'px';
+      star.style.animationDuration = (1 + Math.random()*2) + 's';
+      starsContainer.appendChild(star);
+    }
   }
+  createStars();
 
   // Включаем звук при первом клике
-  function enableVideoWithSound() {
+  function enableSound() {
     video.muted = false;
     video.play().catch(()=>{});
-    showMessage('Видео запущено со звуком', 3000);
-    document.body.removeEventListener('click', enableVideoWithSound);
-    document.body.removeEventListener('touchstart', enableVideoWithSound);
+    document.body.removeEventListener('click', enableSound);
+    document.body.removeEventListener('touchstart', enableSound);
   }
+  document.body.addEventListener('click', enableSound, {once:true, passive:true});
+  document.body.addEventListener('touchstart', enableSound, {once:true, passive:true});
 
-  // Ловим первый клик/тап
-  document.body.addEventListener('click', enableVideoWithSound, {once:true, passive:true});
-  document.body.addEventListener('touchstart', enableVideoWithSound, {once:true, passive:true});
-
-  window.addEventListener('load', ()=> {
-    showMessage('Нажмите один раз по экрану для запуска видео со звуком', 5000);
+  // Ограничиваем видео и звук 13 секундами
+  video.addEventListener('play', ()=>{
+    setTimeout(()=>video.pause(), 13000); // 13 секунд
   });
 
+  // Появление кнопки после окончания видео
+  video.addEventListener('ended', ()=>{
+    portalBtn.classList.add('show');
+  });
 })();
 </script>
 
