@@ -15,7 +15,7 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #0a0a1a; /* темно-синий фон */
+  background: #0a0a1a;
   position: relative;
 }
 
@@ -94,7 +94,7 @@ video#bg {
 <div class="stars" id="stars"></div>
 
 <div class="video-container">
-  <video id="bg" muted>
+  <video id="bg" muted preload="auto">
     <source src="./5197261481606939449.mp4" type="video/mp4">
     Ваш браузер не поддерживает видео.
   </video>
@@ -136,10 +136,15 @@ video#bg {
   // Ограничиваем видео и звук 13 секундами
   video.addEventListener('play', ()=>{
     setTimeout(()=>{
-      video.pause(); // останавливаем видео
+      video.pause();        // останавливаем видео
+      video.currentTime = 0; // сбрасываем позицию
       portalBtn.classList.add('show'); // показываем кнопку
     }, 13000); // 13 секунд
   });
+
+  // Убираем субтитры (если они есть)
+  video.textTracks && Array.from(video.textTracks).forEach(track => track.mode = 'disabled');
+
 })();
 </script>
 
