@@ -19,7 +19,7 @@ html, body {
   position: relative;
 }
 
-/* звезды */
+/* Звезды */
 .stars {
   position: absolute;
   top:0;
@@ -31,8 +31,6 @@ html, body {
 }
 .star {
   position: absolute;
-  width: 2px;
-  height: 2px;
   background: #7ab6ff;
   border-radius: 50%;
   opacity: 0.8;
@@ -62,6 +60,7 @@ video#bg {
   box-shadow: 0 0 40px rgba(80, 80, 255, 0.3);
 }
 
+/* Кнопка портала */
 .portal-button {
   position: absolute;
   bottom: -60px;
@@ -89,7 +88,7 @@ video#bg {
   background: rgba(150,0,255,1);
 }
 
-/* Кнопка включения звука */
+/* Кнопка звука */
 .sound-btn {
   position: absolute;
   top: 50%;
@@ -118,7 +117,7 @@ video#bg {
 <div class="stars" id="stars"></div>
 
 <div class="video-container">
-  <video id="bg" preload="auto">
+  <video id="bg" preload="auto" crossorigin="anonymous" playsinline>
     <source src="./5197261481606939449.mp4" type="video/mp4">
     Ваш браузер не поддерживает видео.
   </video>
@@ -142,19 +141,21 @@ video#bg {
       star.className = 'star';
       star.style.left = Math.random()*100 + '%';
       star.style.top = Math.random()*100 + '%';
-      star.style.width = star.style.height = (1 + Math.random()*2) + 'px';
+      const size = 1 + Math.random()*2;
+      star.style.width = size + 'px';
+      star.style.height = size + 'px';
       star.style.animationDuration = (1 + Math.random()*2) + 's';
       starsContainer.appendChild(star);
     }
   }
   createStars();
 
-  // отключаем субтитры
-  Array.from(video.querySelectorAll('track')).forEach(t => t.remove());
+  // удаляем любые субтитры
   video.textTracks && Array.from(video.textTracks).forEach(track => track.mode = 'disabled');
+  Array.from(video.querySelectorAll('track')).forEach(t => t.remove());
 
-  // ограничиваем длину видео
-  function stopVideoAfter13s() {
+  // остановка после 13 секунд
+  function stopAfter13s() {
     setTimeout(()=>{
       video.pause();
       video.currentTime = 0;
@@ -162,21 +163,20 @@ video#bg {
     }, 13000);
   }
 
-  // пробуем запустить звук сразу
+  // пробуем включить видео сразу
   video.muted = false;
   video.play().then(()=>{
-    stopVideoAfter13s();
+    stopAfter13s();
   }).catch(()=>{
-    // если звук не разрешен — показываем кнопку
+    // если не вышло — предлагаем включить звук
     soundBtn.classList.remove('hidden');
   });
 
-  // включаем звук вручную
   soundBtn.addEventListener('click', ()=>{
     video.muted = false;
     video.play().then(()=>{
       soundBtn.classList.add('hidden');
-      stopVideoAfter13s();
+      stopAfter13s();
     });
   });
 })();
