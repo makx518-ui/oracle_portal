@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Оракул Снов — Вход</title>
 <style>
   html, body {
@@ -12,35 +12,34 @@
     width: 100%;
     overflow: hidden;
     font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    background: #0b0f33; /* темно-синий фон */
+    background: radial-gradient(ellipse at bottom, #001022 0%, #000010 100%);
     position: relative;
   }
 
-  /* Анимация звезд */
-  body::before {
-    content: "";
+  /* Анимация звёзд */
+  .star {
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: transparent url('https://i.ibb.co/1rjV9bR/stars.png') repeat;
-    animation: starsMove 60s linear infinite;
-    z-index: 0;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: twinkle 2s infinite alternate;
   }
 
-  @keyframes starsMove {
-    from {background-position: 0 0;}
-    to {background-position: -1000px 1000px;}
+  @keyframes twinkle {
+    from { opacity: 0.2; }
+    to { opacity: 1; }
   }
 
   .video-container {
-    position: relative;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 80%;
     max-width: 960px;
     aspect-ratio: 16/9;
-    margin: auto;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1;
   }
 
   video#bg {
@@ -49,12 +48,12 @@
     object-fit: contain;
     display: block;
     border-radius: 12px;
-    background: black;
+    background: transparent;
   }
 
   .portal-button {
     position: absolute;
-    bottom: -60px;
+    bottom: 5%;
     left: 50%;
     transform: translateX(-50%);
     padding: 14px 40px;
@@ -65,9 +64,9 @@
     border-radius: 12px;
     border: 2px solid rgba(255,255,255,0.08);
     cursor: pointer;
-    z-index: 2;
+    z-index: 10;
+    display: none;
     transition: transform 0.16s ease, background 0.12s ease;
-    display: none; /* появится после видео */
   }
 
   .portal-button:hover {
@@ -83,36 +82,45 @@
     <source src="oracle_clean.mp4" type="video/mp4">
     Ваш браузер не поддерживает видео.
   </video>
-  <a class="portal-button" id="btnPortal" href="https://t.me/GroqDreams_bot" target="_blank">
+  <a class="portal-button" id="portalBtn" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
     Войти в портал
   </a>
 </div>
 
 <script>
-  const video = document.getElementById('bg');
-  const btn = document.getElementById('btnPortal');
+  // Создаём звёзды
+  const starCount = 100;
+  for(let i=0;i<starCount;i++){
+    const star = document.createElement('div');
+    star.classList.add('star');
+    star.style.top = Math.random()*100 + '%';
+    star.style.left = Math.random()*100 + '%';
+    star.style.width = star.style.height = (Math.random()*2+1)+'px';
+    star.style.animationDuration = (Math.random()*3+1)+'s';
+    document.body.appendChild(star);
+  }
 
-  // Включение звука при первом клике
-  function enableVideoSound() {
+  const video = document.getElementById('bg');
+  const btn = document.getElementById('portalBtn');
+
+  // Запуск звука при первом клике
+  function enableSound() {
     video.muted = false;
     video.play();
-    document.body.removeEventListener('click', enableVideoSound);
-    document.body.removeEventListener('touchstart', enableVideoSound);
+    document.body.removeEventListener('click', enableSound);
+    document.body.removeEventListener('touchstart', enableSound);
   }
-  document.body.addEventListener('click', enableVideoSound, {once:true, passive:true});
-  document.body.addEventListener('touchstart', enableVideoSound, {once:true, passive:true});
 
-  // Остановка видео и появление кнопки через 13 секунд
-  video.addEventListener('loadedmetadata', () => {
-    setTimeout(() => {
+  document.body.addEventListener('click', enableSound, {once:true});
+  document.body.addEventListener('touchstart', enableSound, {once:true});
+
+  // Ставим остановку видео через 13 секунд
+  video.addEventListener('play', ()=>{
+    setTimeout(()=>{
       video.pause();
       btn.style.display = 'block';
-    }, 13000); // 13 секунд
+    }, 13000);
   });
-
-  // Автозапуск без повторения (если браузер позволяет)
-  video.play().catch(()=>{});
 </script>
-
 </body>
 </html>
