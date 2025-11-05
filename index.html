@@ -16,24 +16,43 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    position: relative;
   }
+
+  /* Контейнер видео */
   .video-container {
     position: relative;
-    width: 80%;  /* уменьшаем видео */
-    max-width: 960px; /* максимальный размер */
-    aspect-ratio: 16/9; /* сохраняем соотношение */
+    width: 90%;
+    max-width: 960px;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    border-radius: 12px;
   }
+
   video#bg {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     display: block;
     border-radius: 12px;
-    background: black;
   }
+
+  /* Субтитры */
+  .subtitle {
+    position: absolute;
+    bottom: 10%;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    font-size: 18px;
+    text-shadow: 2px 2px 6px black;
+    z-index: 2;
+  }
+
+  /* Кнопка */
   .portal-button {
     position: absolute;
-    bottom: -60px; /* кнопка снизу под видео */
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     padding: 14px 40px;
@@ -42,53 +61,104 @@
     color: #fff;
     background: rgba(100,0,200,0.9);
     border-radius: 12px;
-    border: 2px solid rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.1);
     cursor: pointer;
-    z-index: 2;
-    transition: transform 0.16s ease, background 0.12s ease;
+    z-index: 3;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.2s ease, transform 0.4s ease;
+  }
+  .portal-button.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
   }
   .portal-button:hover {
-    transform: translateX(-50%) translateY(-3px);
     background: rgba(150,0,255,1);
+    transform: translateX(-50%) translateY(-3px) scale(1.05);
   }
+
+  /* Мистические звезды */
+  .stars {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: twinkle 2s infinite alternate;
+  }
+  @keyframes twinkle {
+    0% {opacity: 0.2;}
+    50% {opacity: 1;}
+    100% {opacity: 0.2;}
+  }
+
   .message {
     position: absolute;
     top: 10px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 3;
+    z-index: 4;
     background: rgba(0,0,0,0.5);
     padding: 6px 12px;
     border-radius: 8px;
     font-size: 13px;
     color: #fff;
   }
-  .hidden { display: none; }
 </style>
 </head>
 <body>
 
 <div class="video-container">
-  <video id="bg" playsinline loop preload="auto">
+  <video id="bg" playsinline preload="auto">
     <source src="./5197261481606939449.mp4" type="video/mp4">
     Ваш браузер не поддерживает видео.
   </video>
-  <a class="portal-button" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
+
+  <div class="subtitle" id="subtitle">Смотрим сны…</div>
+  <a id="portalBtn" class="portal-button" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
     Войти в портал
   </a>
+
+  <div class="stars" id="stars"></div>
 </div>
 
-<div id="msg" class="message hidden"></div>
+<div id="msg" class="message"></div>
 
 <script>
 (function(){
   const video = document.getElementById('bg');
+  const portalBtn = document.getElementById('portalBtn');
+  const subtitle = document.getElementById('subtitle');
   const msg = document.getElementById('msg');
+  const starsContainer = document.getElementById('stars');
+
+  // Создание звезд
+  function createStars(count=50){
+    for(let i=0;i<count;i++){
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random()*100 + '%';
+      star.style.top = Math.random()*100 + '%';
+      star.style.width = star.style.height = (1 + Math.random()*2) + 'px';
+      star.style.animationDuration = (1 + Math.random()*2) + 's';
+      starsContainer.appendChild(star);
+    }
+  }
+  createStars();
 
   function showMessage(text, timeout=4000) {
     msg.textContent = text;
-    msg.classList.remove('hidden');
-    if(timeout>0) setTimeout(()=>msg.classList.add('hidden'), timeout);
+    msg.style.display = 'block';
+    if(timeout>0) setTimeout(()=>msg.style.display='none', timeout);
   }
 
   // Включаем звук при первом клике
@@ -100,14 +170,19 @@
     document.body.removeEventListener('touchstart', enableVideoWithSound);
   }
 
-  // Ловим первый клик/тап
   document.body.addEventListener('click', enableVideoWithSound, {once:true, passive:true});
   document.body.addEventListener('touchstart', enableVideoWithSound, {once:true, passive:true});
+
+  // После окончания видео
+  video.addEventListener('ended', ()=>{
+    subtitle.style.display = 'none';
+    portalBtn.classList.add('show'); // плавно проявляем кнопку
+    showMessage('Нажмите кнопку, чтобы войти в портал', 5000);
+  });
 
   window.addEventListener('load', ()=> {
     showMessage('Нажмите один раз по экрану для запуска видео со звуком', 5000);
   });
-
 })();
 </script>
 
