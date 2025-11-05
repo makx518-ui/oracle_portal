@@ -19,9 +19,9 @@
   }
   .video-container {
     position: relative;
-    width: 80%;  /* уменьшаем видео */
-    max-width: 960px; /* максимальный размер */
-    aspect-ratio: 16/9; /* сохраняем соотношение */
+    width: 80%;
+    max-width: 960px;
+    aspect-ratio: 16/9;
   }
   video#bg {
     width: 100%;
@@ -33,7 +33,7 @@
   }
   .portal-button {
     position: absolute;
-    bottom: -60px; /* кнопка снизу под видео */
+    bottom: -60px;
     left: 50%;
     transform: translateX(-50%);
     padding: 14px 40px;
@@ -51,26 +51,13 @@
     transform: translateX(-50%) translateY(-3px);
     background: rgba(150,0,255,1);
   }
-  .message {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 3;
-    background: rgba(0,0,0,0.5);
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 13px;
-    color: #fff;
-  }
-  .hidden { display: none; }
 </style>
 </head>
 <body>
 
 <div class="video-container">
-  <video id="bg" playsinline loop preload="auto">
-    <source src="./oracle_clean.mp4" type="video/mp4">
+  <video id="bg" playsinline preload="auto">
+    <source src="5197261481606939449.mp4" type="video/mp4">
     Ваш браузер не поддерживает видео.
   </video>
   <a class="portal-button" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
@@ -78,37 +65,10 @@
   </a>
 </div>
 
-<div id="msg" class="message hidden"></div>
-
 <script>
-(function(){
   const video = document.getElementById('bg');
-  const msg = document.getElementById('msg');
-
-  function showMessage(text, timeout=4000) {
-    msg.textContent = text;
-    msg.classList.remove('hidden');
-    if(timeout>0) setTimeout(()=>msg.classList.add('hidden'), timeout);
-  }
-
-  // Включаем звук при первом клике
-  function enableVideoWithSound() {
-    video.muted = false;
-    video.play().catch(()=>{});
-    showMessage('Видео запущено со звуком', 3000);
-    document.body.removeEventListener('click', enableVideoWithSound);
-    document.body.removeEventListener('touchstart', enableVideoWithSound);
-  }
-
-  // Ловим первый клик/тап
-  document.body.addEventListener('click', enableVideoWithSound, {once:true, passive:true});
-  document.body.addEventListener('touchstart', enableVideoWithSound, {once:true, passive:true});
-
-  window.addEventListener('load', ()=> {
-    showMessage('Нажмите один раз по экрану для запуска видео со звуком', 5000);
-  });
-
-})();
+  video.muted = false;
+  video.play().catch(()=>{}); // Включаем сразу видео с звуком при возможности
 </script>
 
 </body>
