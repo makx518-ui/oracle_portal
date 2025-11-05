@@ -10,50 +10,30 @@
     padding: 0;
     height: 100%;
     width: 100%;
-    overflow: hidden;
+    background: black;
     font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    background: radial-gradient(ellipse at bottom, #001022 0%, #000010 100%);
-    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
-
-  /* Анимация звёзд */
-  .star {
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    background: white;
-    border-radius: 50%;
-    opacity: 0.8;
-    animation: twinkle 2s infinite alternate;
-  }
-
-  @keyframes twinkle {
-    from { opacity: 0.2; }
-    to { opacity: 1; }
-  }
-
   .video-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: relative;
     width: 80%;
     max-width: 960px;
     aspect-ratio: 16/9;
   }
-
   video#bg {
     width: 100%;
     height: 100%;
     object-fit: contain;
     display: block;
     border-radius: 12px;
-    background: transparent;
+    background: black;
   }
-
   .portal-button {
     position: absolute;
-    bottom: 5%;
+    bottom: -60px; /* кнопка снизу под видео */
     left: 50%;
     transform: translateX(-50%);
     padding: 14px 40px;
@@ -64,11 +44,9 @@
     border-radius: 12px;
     border: 2px solid rgba(255,255,255,0.08);
     cursor: pointer;
-    z-index: 10;
-    display: none;
+    z-index: 2;
     transition: transform 0.16s ease, background 0.12s ease;
   }
-
   .portal-button:hover {
     transform: translateX(-50%) translateY(-3px);
     background: rgba(150,0,255,1);
@@ -78,49 +56,28 @@
 <body>
 
 <div class="video-container">
-  <video id="bg" playsinline preload="auto">
+  <video id="bg" autoplay playsinline>
     <source src="oracle_clean.mp4" type="video/mp4">
     Ваш браузер не поддерживает видео.
   </video>
-  <a class="portal-button" id="portalBtn" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
+  <a class="portal-button" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
     Войти в портал
   </a>
 </div>
 
 <script>
-  // Создаём звёзды
-  const starCount = 100;
-  for(let i=0;i<starCount;i++){
-    const star = document.createElement('div');
-    star.classList.add('star');
-    star.style.top = Math.random()*100 + '%';
-    star.style.left = Math.random()*100 + '%';
-    star.style.width = star.style.height = (Math.random()*2+1)+'px';
-    star.style.animationDuration = (Math.random()*3+1)+'s';
-    document.body.appendChild(star);
-  }
-
   const video = document.getElementById('bg');
-  const btn = document.getElementById('portalBtn');
+  const button = document.querySelector('.portal-button');
 
-  // Запуск звука при первом клике
-  function enableSound() {
-    video.muted = false;
-    video.play();
-    document.body.removeEventListener('click', enableSound);
-    document.body.removeEventListener('touchstart', enableSound);
-  }
-
-  document.body.addEventListener('click', enableSound, {once:true});
-  document.body.addEventListener('touchstart', enableSound, {once:true});
-
-  // Ставим остановку видео через 13 секунд
-  video.addEventListener('play', ()=>{
-    setTimeout(()=>{
-      video.pause();
-      btn.style.display = 'block';
-    }, 13000);
+  // Видео играет один раз и останавливается
+  video.addEventListener('ended', () => {
+    video.pause(); // на всякий случай
+    button.style.display = 'block'; // кнопка остаётся видимой
   });
+
+  // Убираем автозакрытие кнопки
+  button.style.display = 'block';
 </script>
+
 </body>
 </html>
