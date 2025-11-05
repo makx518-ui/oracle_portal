@@ -12,25 +12,30 @@
     width: 100%;
     background: black;
     font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    overflow: hidden;
     display: flex;
     justify-content: center;
-    align-items: flex-end;
+    align-items: center;
+    overflow: hidden;
+  }
+  .video-container {
+    position: relative;
+    width: 80%;  /* уменьшаем видео */
+    max-width: 960px; /* максимальный размер */
+    aspect-ratio: 16/9; /* сохраняем соотношение */
   }
   video#bg {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Видео помещается полностью */
-    z-index: 0;
+    object-fit: contain;
+    display: block;
+    border-radius: 12px;
     background: black;
   }
   .portal-button {
-    position: relative;
-    z-index: 2;
-    margin-bottom: 20px;
+    position: absolute;
+    bottom: -60px; /* кнопка снизу под видео */
+    left: 50%;
+    transform: translateX(-50%);
     padding: 14px 40px;
     font-size: 20px;
     text-decoration: none;
@@ -39,10 +44,11 @@
     border-radius: 12px;
     border: 2px solid rgba(255,255,255,0.08);
     cursor: pointer;
+    z-index: 2;
     transition: transform 0.16s ease, background 0.12s ease;
   }
   .portal-button:hover {
-    transform: translateY(-3px);
+    transform: translateX(-50%) translateY(-3px);
     background: rgba(150,0,255,1);
   }
   .message {
@@ -62,14 +68,15 @@
 </head>
 <body>
 
-<video id="bg" playsinline loop preload="auto">
-  <source src="./5197261481606939449.mp4" type="video/mp4">
-  Ваш браузер не поддерживает видео.
-</video>
-
-<a class="portal-button" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
-  Войти в портал
-</a>
+<div class="video-container">
+  <video id="bg" playsinline loop preload="auto">
+    <source src="./5197261481606939449.mp4" type="video/mp4">
+    Ваш браузер не поддерживает видео.
+  </video>
+  <a class="portal-button" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
+    Войти в портал
+  </a>
+</div>
 
 <div id="msg" class="message hidden"></div>
 
@@ -84,21 +91,20 @@
     if(timeout>0) setTimeout(()=>msg.classList.add('hidden'), timeout);
   }
 
-  // При первом клике запускаем видео со звуком
+  // Включаем звук при первом клике
   function enableVideoWithSound() {
     video.muted = false;
     video.play().catch(()=>{});
+    showMessage('Видео запущено со звуком', 3000);
     document.body.removeEventListener('click', enableVideoWithSound);
     document.body.removeEventListener('touchstart', enableVideoWithSound);
-    showMessage('Видео запущено', 2000);
   }
 
-  // Добавляем слушатели для первого клика
+  // Ловим первый клик/тап
   document.body.addEventListener('click', enableVideoWithSound, {once:true, passive:true});
   document.body.addEventListener('touchstart', enableVideoWithSound, {once:true, passive:true});
 
-  // Показываем сообщение при загрузке, если видео ещё не воспроизводится
-  window.addEventListener('load', () => {
+  window.addEventListener('load', ()=> {
     showMessage('Нажмите один раз по экрану для запуска видео со звуком', 5000);
   });
 
