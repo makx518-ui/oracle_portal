@@ -1,39 +1,77 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Оракул Снов — Вход</title>
 <style>
-  :root { --btn-bg: rgba(100,0,200,0.9); --btn-hover: rgba(150,0,255,1); }
-  html,body { height:100%; margin:0; background:#000; font-family: "Segoe UI", Roboto, Arial, sans-serif; color:#fff; }
-  .stage { position:relative; width:100%; height:100vh; overflow:hidden; display:flex; align-items:flex-end; justify-content:center; }
-  video#bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; background:#000; }
-  .overlay { position:relative; z-index:2; width:100%; display:flex; justify-content:center; padding:32px 20px; box-sizing:border-box; pointer-events:auto; }
-  .portal-button {
-    display:inline-block; padding:14px 40px; font-size:20px; text-decoration:none; color:#fff;
-    background:var(--btn-bg); border-radius:12px; border:2px solid rgba(255,255,255,0.08);
-    box-shadow:0 8px 24px rgba(100,0,200,0.16); transition:transform .16s ease, background .12s ease;
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    background: black;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
   }
-  .portal-button:hover { transform:translateY(-3px); background:var(--btn-hover); }
-  .message { position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:3; background:rgba(0,0,0,0.5); padding:8px 12px; border-radius:8px; font-size:13px; }
-  .hidden { display:none; }
-  @media (max-width:520px) { .portal-button{ padding:12px 28px; font-size:18px; } }
+  video#bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Видео помещается полностью */
+    z-index: 0;
+    background: black;
+  }
+  .portal-button {
+    position: relative;
+    z-index: 2;
+    margin-bottom: 20px;
+    padding: 14px 40px;
+    font-size: 20px;
+    text-decoration: none;
+    color: #fff;
+    background: rgba(100,0,200,0.9);
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.08);
+    cursor: pointer;
+    transition: transform 0.16s ease, background 0.12s ease;
+  }
+  .portal-button:hover {
+    transform: translateY(-3px);
+    background: rgba(150,0,255,1);
+  }
+  .message {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    background: rgba(0,0,0,0.5);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #fff;
+  }
+  .hidden { display: none; }
 </style>
 </head>
 <body>
-  <div class="stage" id="stage">
-    <video id="bg" playsinline muted loop preload="auto">
-      <source src="./5197261481606939449.mp4" type="video/mp4">
-      Ваш браузер не поддерживает видео.
-    </video>
 
-    <div class="overlay">
-      <a id="portal" class="portal-button" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">Войти в портал</a>
-    </div>
+<video id="bg" playsinline loop preload="auto">
+  <source src="./5197261481606939449.mp4" type="video/mp4">
+  Ваш браузер не поддерживает видео.
+</video>
 
-    <div id="msg" class="message hidden" role="status" aria-live="polite"></div>
-  </div>
+<a class="portal-button" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
+  Войти в портал
+</a>
+
+<div id="msg" class="message hidden"></div>
 
 <script>
 (function(){
@@ -43,52 +81,29 @@
   function showMessage(text, timeout=4000) {
     msg.textContent = text;
     msg.classList.remove('hidden');
-    if (timeout>0) setTimeout(()=>msg.classList.add('hidden'), timeout);
+    if(timeout>0) setTimeout(()=>msg.classList.add('hidden'), timeout);
   }
 
-  // Попытка автозапуска (mute + playsinline помогает)
-  function tryPlay() {
-    // ensure muted
-    video.muted = true;
-    const p = video.play();
-    if (p && p.then) {
-      p.then(()=> {
-        // OK
-        showMessage('Заставка запущена', 2000);
-      }).catch(err => {
-        // Автоплей заблокирован — покажем подсказку
-        showMessage('Нажмите один раз по экрану, чтобы включить заставку', 6000);
-        // Включим воспроизведение при первом клике/тапе
-        const one = () => { video.play().catch(()=>{}); document.body.removeEventListener('click', one); document.body.removeEventListener('touchstart', one); };
-        document.body.addEventListener('click', one, { once:true, passive:true });
-        document.body.addEventListener('touchstart', one, { once:true, passive:true });
-      });
-    } else {
-      // Старые браузеры
-      setTimeout(()=>{ if (video.paused) showMessage('Нажмите по экрану, чтобы включить видео',6000); }, 500);
-    }
+  // При первом клике запускаем видео со звуком
+  function enableVideoWithSound() {
+    video.muted = false;
+    video.play().catch(()=>{});
+    document.body.removeEventListener('click', enableVideoWithSound);
+    document.body.removeEventListener('touchstart', enableVideoWithSound);
+    showMessage('Видео запущено', 2000);
   }
 
-  // Если при загрузке видео ошибка — отображаем подсказку
-  video.addEventListener('error', (e) => {
-    console.error('Video error', e);
-    showMessage('Ошибка загрузки видео. Проверьте, что файл 5197261481606939449.mp4 загружен в репозиторий.', 8000);
+  // Добавляем слушатели для первого клика
+  document.body.addEventListener('click', enableVideoWithSound, {once:true, passive:true});
+  document.body.addEventListener('touchstart', enableVideoWithSound, {once:true, passive:true});
+
+  // Показываем сообщение при загрузке, если видео ещё не воспроизводится
+  window.addEventListener('load', () => {
+    showMessage('Нажмите один раз по экрану для запуска видео со звуком', 5000);
   });
 
-  // Если ресурс загружен — пробуем запустить
-  video.addEventListener('canplay', ()=> {
-    // play if paused (best-effort)
-    if (video.paused) {
-      tryPlay();
-    }
-  });
-
-  // Попытка на загрузке страницы
-  window.addEventListener('load', ()=> {
-    // краткая задержка перед запуском, чтобы GitHub Pages успел отдать файл
-    setTimeout(tryPlay, 150);
-  });
 })();
 </script>
+
 </body>
 </html>
