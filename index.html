@@ -8,11 +8,11 @@
   html, body {
     margin: 0;
     padding: 0;
-    overflow: hidden;
     height: 100%;
-    background: radial-gradient(ellipse at center, #0a0a1a 0%, #000 100%);
-    color: white;
+    overflow: hidden;
+    background: radial-gradient(ellipse at center, #030314 0%, #000 100%);
     font-family: 'Segoe UI', sans-serif;
+    color: white;
   }
 
   #stars {
@@ -45,6 +45,7 @@
     max-height: 80%;
     border-radius: 20px;
     z-index: 2;
+    background: black;
   }
 
   #portalBtn {
@@ -53,12 +54,11 @@
     left: 50%;
     transform: translateX(-50%);
     padding: 12px 30px;
-    background: rgba(50,150,255,0.8);
+    background: rgba(100,0,255,0.8);
     border: none;
     border-radius: 30px;
     color: white;
     font-size: 1.2em;
-    letter-spacing: 1px;
     cursor: pointer;
     opacity: 0;
     transition: opacity 1s ease-in-out;
@@ -68,98 +68,69 @@
   #portalBtn.show {
     opacity: 1;
   }
-
-  #soundBtn {
-    position: absolute;
-    top: 6%;
-    right: 6%;
-    padding: 10px 22px;
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 20px;
-    color: white;
-    cursor: pointer;
-    z-index: 3;
-    opacity: 0;
-    transition: opacity 0.5s;
-  }
-
-  #soundBtn.show {
-    opacity: 1;
-  }
 </style>
 </head>
 <body>
 
 <div id="stars"></div>
 
-<video id="bg" autoplay muted playsinline>
+<video id="bg" playsinline preload="auto">
   <source src="./5197261481606939449.mp4" type="video/mp4">
 </video>
 
-<button id="portalBtn">Войти в Портал</button>
-<button id="soundBtn" class="hidden">🔊 Включить звук</button>
+<a id="portalBtn" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
+  Войти в Портал
+</a>
 
 <script>
 (function(){
   const video = document.getElementById('bg');
-  const soundBtn = document.getElementById('soundBtn');
   const portalBtn = document.getElementById('portalBtn');
   const starsContainer = document.getElementById('stars');
 
-  // создаем звезды
-  function createStars(count=60){
-    for(let i=0;i<count;i++){
-      const star = document.createElement('div');
-      star.className = 'star';
-      star.style.left = Math.random()*100 + '%';
-      star.style.top = Math.random()*100 + '%';
-      const size = 1 + Math.random()*2;
-      star.style.width = size + 'px';
-      star.style.height = size + 'px';
-      star.style.animationDuration = (1 + Math.random()*2) + 's';
-      starsContainer.appendChild(star);
-    }
+  // создаём мерцающие звёзды
+  for(let i=0;i<60;i++){
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random()*100 + '%';
+    star.style.top = Math.random()*100 + '%';
+    const size = 1 + Math.random()*2;
+    star.style.width = size + 'px';
+    star.style.height = size + 'px';
+    star.style.animationDuration = (1 + Math.random()*2) + 's';
+    starsContainer.appendChild(star);
   }
-  createStars();
 
-  // --- УБИРАЕМ ВСЕ СУБТИТРЫ ---
-  function disableSubs() {
+  // Удаляем все возможные дорожки субтитров
+  const removeTracks = () => {
     const tracks = video.querySelectorAll('track');
     tracks.forEach(t => t.remove());
-    if (video.textTracks) {
-      for (let i = 0; i < video.textTracks.length; i++) {
+    if(video.textTracks) {
+      for(let i=0; i<video.textTracks.length; i++) {
         video.textTracks[i].mode = 'disabled';
       }
     }
-  }
-  disableSubs();
-  setInterval(disableSubs, 1000);
+  };
+  removeTracks();
 
-  // --- остановка после 13 секунд ---
-  function stopAfter13s() {
-    setTimeout(()=>{
-      video.pause();
-      video.currentTime = 0;
-      portalBtn.classList.add('show');
-    }, 13000);
-  }
-
-  // --- попытка воспроизведения ---
-  video.muted = false;
-  video.play().then(()=>{
-    stopAfter13s();
-  }).catch(()=>{
-    soundBtn.classList.add('show');
-  });
-
-  soundBtn.addEventListener('click', ()=>{
+  // Включаем звук после клика
+  const enableSound = () => {
     video.muted = false;
-    video.play().then(()=>{
-      soundBtn.classList.remove('show');
-      stopAfter13s();
-    });
-  });
+    video.play();
+    document.body.removeEventListener('click', enableSound);
+  };
+  document.body.addEventListener('click', enableSound);
+
+  // Стартуем видео
+  video.muted = false;
+  video.play().catch(()=>{});
+
+  // Останавливаем через 13 секунд
+  setTimeout(()=>{
+    video.pause();
+    video.currentTime = 0;
+    portalBtn.classList.add('show');
+  },13000);
 })();
 </script>
 
