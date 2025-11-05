@@ -2,130 +2,103 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Оракул Снов — Вход</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Оракул Снов — Вход в Портал</title>
 <style>
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  font-family: "Segoe UI", Roboto, Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: radial-gradient(ellipse at center, #0b0b25 0%, #000010 100%);
-  position: relative;
-}
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    background: radial-gradient(ellipse at center, #0a0a1a 0%, #000 100%);
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+  }
 
-/* Звезды */
-.stars {
-  position: absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  pointer-events: none;
-  z-index: 1;
-}
-.star {
-  position: absolute;
-  background: #7ab6ff;
-  border-radius: 50%;
-  opacity: 0.8;
-  animation: twinkle 2s infinite alternate;
-}
-@keyframes twinkle {
-  0% {opacity: 0.2;}
-  50% {opacity: 1;}
-  100% {opacity: 0.2;}
-}
+  #stars {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    overflow: hidden;
+    z-index: 0;
+  }
 
-.video-container {
-  position: relative;
-  width: 80%;
-  max-width: 960px;
-  aspect-ratio: 16/9;
-  z-index: 2;
-}
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: blink 2s infinite ease-in-out;
+  }
 
-video#bg {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-  border-radius: 12px;
-  background: black;
-  box-shadow: 0 0 40px rgba(80, 80, 255, 0.3);
-}
+  @keyframes blink {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
 
-/* Кнопка портала */
-.portal-button {
-  position: absolute;
-  bottom: -60px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 14px 40px;
-  font-size: 20px;
-  text-decoration: none;
-  color: #fff;
-  background: rgba(100,0,200,0.9);
-  border-radius: 12px;
-  border: 2px solid rgba(255,255,255,0.08);
-  cursor: pointer;
-  z-index: 3;
-  opacity: 0;
-  pointer-events: none;
-  transition: transform 0.16s ease, background 0.12s ease, opacity 1s ease;
-}
-.portal-button.show {
-  opacity: 1;
-  pointer-events: auto;
-}
-.portal-button:hover {
-  transform: translateX(-50%) translateY(-3px);
-  background: rgba(150,0,255,1);
-}
+  video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 80%;
+    max-height: 80%;
+    border-radius: 20px;
+    z-index: 2;
+  }
 
-/* Кнопка звука */
-.sound-btn {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0, 0, 50, 0.7);
-  color: #fff;
-  padding: 14px 32px;
-  font-size: 22px;
-  border: 2px solid #7ab6ff;
-  border-radius: 10px;
-  cursor: pointer;
-  z-index: 4;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(4px);
-}
-.sound-btn:hover {
-  background: rgba(20, 20, 80, 0.9);
-  transform: translate(-50%, -50%) scale(1.05);
-}
-.hidden { display: none; }
+  #portalBtn {
+    position: absolute;
+    bottom: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 30px;
+    background: rgba(50,150,255,0.8);
+    border: none;
+    border-radius: 30px;
+    color: white;
+    font-size: 1.2em;
+    letter-spacing: 1px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    z-index: 3;
+  }
+
+  #portalBtn.show {
+    opacity: 1;
+  }
+
+  #soundBtn {
+    position: absolute;
+    top: 6%;
+    right: 6%;
+    padding: 10px 22px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    z-index: 3;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  #soundBtn.show {
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
 
-<div class="stars" id="stars"></div>
+<div id="stars"></div>
 
-<div class="video-container">
-  <video id="bg" preload="auto" crossorigin="anonymous" playsinline>
-    <source src="./5197261481606939449.mp4" type="video/mp4">
-    Ваш браузер не поддерживает видео.
-  </video>
-  <button id="soundBtn" class="sound-btn hidden">🔊 Включить звук</button>
-  <a class="portal-button" id="portalBtn" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
-    Войти в портал
-  </a>
-</div>
+<video id="bg" autoplay muted playsinline>
+  <source src="./5197261481606939449.mp4" type="video/mp4">
+</video>
+
+<button id="portalBtn">Войти в Портал</button>
+<button id="soundBtn" class="hidden">🔊 Включить звук</button>
 
 <script>
 (function(){
@@ -150,11 +123,20 @@ video#bg {
   }
   createStars();
 
-  // удаляем любые субтитры
-  video.textTracks && Array.from(video.textTracks).forEach(track => track.mode = 'disabled');
-  Array.from(video.querySelectorAll('track')).forEach(t => t.remove());
+  // --- УБИРАЕМ ВСЕ СУБТИТРЫ ---
+  function disableSubs() {
+    const tracks = video.querySelectorAll('track');
+    tracks.forEach(t => t.remove());
+    if (video.textTracks) {
+      for (let i = 0; i < video.textTracks.length; i++) {
+        video.textTracks[i].mode = 'disabled';
+      }
+    }
+  }
+  disableSubs();
+  setInterval(disableSubs, 1000);
 
-  // остановка после 13 секунд
+  // --- остановка после 13 секунд ---
   function stopAfter13s() {
     setTimeout(()=>{
       video.pause();
@@ -163,19 +145,18 @@ video#bg {
     }, 13000);
   }
 
-  // пробуем включить видео сразу
+  // --- попытка воспроизведения ---
   video.muted = false;
   video.play().then(()=>{
     stopAfter13s();
   }).catch(()=>{
-    // если не вышло — предлагаем включить звук
-    soundBtn.classList.remove('hidden');
+    soundBtn.classList.add('show');
   });
 
   soundBtn.addEventListener('click', ()=>{
     video.muted = false;
     video.play().then(()=>{
-      soundBtn.classList.add('hidden');
+      soundBtn.classList.remove('show');
       stopAfter13s();
     });
   });
