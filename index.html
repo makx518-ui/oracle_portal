@@ -12,54 +12,22 @@ html, body {
   width: 100%;
   overflow: hidden;
   font-family: 'Segoe UI', sans-serif;
+  background: black; /* простой черный фон */
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #0a0a1a; /* темно-синяя основа */
-}
-
-/* Фон с градиентом и звездами */
-body::before {
-  content: '';
-  position: absolute;
-  top:0; left:0; right:0; bottom:0;
-  background: linear-gradient(to bottom, #0a0a1a 0%, #000022 100%);
-  z-index: 0;
-}
-
-.stars {
-  position: absolute;
-  top:0; left:0; width:100%; height:100%;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.star {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: white;
-  border-radius: 50%;
-  opacity: 0.8;
-  animation: twinkle 2s infinite alternate;
-}
-@keyframes twinkle {
-  0% {opacity: 0.2;}
-  50% {opacity: 1;}
-  100% {opacity: 0.2;}
 }
 
 .video-container {
   position: relative;
-  z-index: 2; /* поверх фона и звезд */
+  z-index: 1;
 }
 
 video#bg {
   display: block;
   width: auto;
-  max-width: 90vw;
-  max-height: 80vh;
-  border-radius: 12px;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .portal-button {
@@ -75,29 +43,25 @@ video#bg {
   border-radius: 12px;
   border: 2px solid rgba(255,255,255,0.1);
   cursor: pointer;
-  z-index: 3;
+  z-index: 2;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 1.2s ease, transform 0.4s ease;
+  transition: opacity 1s ease;
 }
 .portal-button.show {
   opacity: 1;
   pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
 }
 .portal-button:hover {
   background: rgba(150,0,255,1);
-  transform: translateX(-50%) translateY(-3px) scale(1.05);
 }
 </style>
 </head>
 <body>
 
-<div class="stars" id="stars"></div>
-
 <div class="video-container">
   <video id="bg" muted>
-    <source src="./5197261481606939449.mp4" type="video/mp4">
+    <source src="5197261481606939449.mp4" type="video/mp4">
     Ваш браузер не поддерживает видео.
   </video>
 
@@ -110,21 +74,6 @@ video#bg {
 (function(){
   const video = document.getElementById('bg');
   const portalBtn = document.getElementById('portalBtn');
-  const starsContainer = document.getElementById('stars');
-
-  // Создаем случайные звезды
-  function createStars(count=50){
-    for(let i=0;i<count;i++){
-      const star = document.createElement('div');
-      star.className = 'star';
-      star.style.left = Math.random()*100 + '%';
-      star.style.top = Math.random()*100 + '%';
-      star.style.width = star.style.height = (1 + Math.random()*2) + 'px';
-      star.style.animationDuration = (1 + Math.random()*2) + 's';
-      starsContainer.appendChild(star);
-    }
-  }
-  createStars();
 
   // Видео играет один раз, звук по клику
   function enableVideo() {
