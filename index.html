@@ -10,107 +10,105 @@
     padding: 0;
     height: 100%;
     width: 100%;
-    background: radial-gradient(#00111a, #000010);
-    overflow: hidden;
+    background: black;
     font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
   }
-
-  /* Звезды */
-  body::before {
-    content: '';
-    position: absolute;
-    width: 200%;
-    height: 200%;
-    top: -50%;
-    left: -50%;
-    background: transparent;
-    box-shadow:
-      50px 100px #fff,
-      200px 400px #fff,
-      400px 300px #fff,
-      800px 500px #fff,
-      1200px 200px #fff,
-      600px 800px #fff;
-    animation: starsMove 60s linear infinite;
-  }
-  @keyframes starsMove {
-    0% { transform: translate(0,0); }
-    100% { transform: translate(-100px,-200px); }
-  }
-
   .video-container {
     position: relative;
-    width: 80%;
-    max-width: 720px;
-    margin: 0 auto;
-    top: 50%;
-    transform: translateY(-50%);
+    width: 80%;  /* уменьшаем видео */
+    max-width: 960px; /* максимальный размер */
+    aspect-ratio: 16/9; /* сохраняем соотношение */
   }
-
   video#bg {
     width: 100%;
-    height: auto;
+    height: 100%;
     object-fit: contain;
-    border-radius: 12px;
     display: block;
+    border-radius: 12px;
     background: black;
   }
-
   .portal-button {
     position: absolute;
-    bottom: 20px;
+    bottom: -60px; /* кнопка снизу под видео */
     left: 50%;
     transform: translateX(-50%);
     padding: 14px 40px;
     font-size: 20px;
+    text-decoration: none;
     color: #fff;
     background: rgba(100,0,200,0.9);
     border-radius: 12px;
     border: 2px solid rgba(255,255,255,0.08);
-    text-decoration: none;
     cursor: pointer;
     z-index: 2;
-    display: none; /* пока скрыта, появится после видео */
+    transition: transform 0.16s ease, background 0.12s ease;
   }
-
   .portal-button:hover {
+    transform: translateX(-50%) translateY(-3px);
     background: rgba(150,0,255,1);
   }
+  .message {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    background: rgba(0,0,0,0.5);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #fff;
+  }
+  .hidden { display: none; }
 </style>
 </head>
 <body>
 
 <div class="video-container">
-  <video id="bg" playsinline preload="auto">
+  <video id="bg" playsinline loop preload="auto">
     <source src="./oracle_clean.mp4" type="video/mp4">
     Ваш браузер не поддерживает видео.
   </video>
-  <a class="portal-button" id="portalBtn" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
+  <a class="portal-button" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
     Войти в портал
   </a>
 </div>
 
-<script>
-  const video = document.getElementById('bg');
-  const button = document.getElementById('portalBtn');
+<div id="msg" class="message hidden"></div>
 
-  // Запускаем видео с кликом, включаем звук
-  function playVideo() {
+<script>
+(function(){
+  const video = document.getElementById('bg');
+  const msg = document.getElementById('msg');
+
+  function showMessage(text, timeout=4000) {
+    msg.textContent = text;
+    msg.classList.remove('hidden');
+    if(timeout>0) setTimeout(()=>msg.classList.add('hidden'), timeout);
+  }
+
+  // Включаем звук при первом клике
+  function enableVideoWithSound() {
     video.muted = false;
     video.play().catch(()=>{});
-    document.body.removeEventListener('click', playVideo);
-    document.body.removeEventListener('touchstart', playVideo);
+    showMessage('Видео запущено со звуком', 3000);
+    document.body.removeEventListener('click', enableVideoWithSound);
+    document.body.removeEventListener('touchstart', enableVideoWithSound);
   }
-  document.body.addEventListener('click', playVideo, {once:true, passive:true});
-  document.body.addEventListener('touchstart', playVideo, {once:true, passive:true});
 
-  // Показываем кнопку, когда видео закончено
-  video.addEventListener('ended', () => {
-    button.style.display = 'block';
+  // Ловим первый клик/тап
+  document.body.addEventListener('click', enableVideoWithSound, {once:true, passive:true});
+  document.body.addEventListener('touchstart', enableVideoWithSound, {once:true, passive:true});
+
+  window.addEventListener('load', ()=> {
+    showMessage('Нажмите один раз по экрану для запуска видео со звуком', 5000);
   });
 
-  // Чтобы видео не зацикливалось
-  video.loop = false;
+})();
 </script>
 
 </body>
