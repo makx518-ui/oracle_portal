@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Оракул Снов — Вход</title>
 <style>
   html, body {
@@ -10,19 +10,39 @@
     padding: 0;
     height: 100%;
     width: 100%;
-    background: black;
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     overflow: hidden;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: #0b0f33; /* темно-синий фон */
+    position: relative;
   }
+
+  /* Анимация звезд */
+  body::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: transparent url('https://i.ibb.co/1rjV9bR/stars.png') repeat;
+    animation: starsMove 60s linear infinite;
+    z-index: 0;
+  }
+
+  @keyframes starsMove {
+    from {background-position: 0 0;}
+    to {background-position: -1000px 1000px;}
+  }
+
   .video-container {
     position: relative;
     width: 80%;
     max-width: 960px;
     aspect-ratio: 16/9;
+    margin: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
   }
+
   video#bg {
     width: 100%;
     height: 100%;
@@ -31,6 +51,7 @@
     border-radius: 12px;
     background: black;
   }
+
   .portal-button {
     position: absolute;
     bottom: -60px;
@@ -46,7 +67,9 @@
     cursor: pointer;
     z-index: 2;
     transition: transform 0.16s ease, background 0.12s ease;
+    display: none; /* появится после видео */
   }
+
   .portal-button:hover {
     transform: translateX(-50%) translateY(-3px);
     background: rgba(150,0,255,1);
@@ -57,18 +80,38 @@
 
 <div class="video-container">
   <video id="bg" playsinline preload="auto">
-    <source src="5197261481606939449.mp4" type="video/mp4">
+    <source src="oracle_clean.mp4" type="video/mp4">
     Ваш браузер не поддерживает видео.
   </video>
-  <a class="portal-button" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
+  <a class="portal-button" id="btnPortal" href="https://t.me/GroqDreams_bot" target="_blank">
     Войти в портал
   </a>
 </div>
 
 <script>
   const video = document.getElementById('bg');
-  video.muted = false;
-  video.play().catch(()=>{}); // Включаем сразу видео с звуком при возможности
+  const btn = document.getElementById('btnPortal');
+
+  // Включение звука при первом клике
+  function enableVideoSound() {
+    video.muted = false;
+    video.play();
+    document.body.removeEventListener('click', enableVideoSound);
+    document.body.removeEventListener('touchstart', enableVideoSound);
+  }
+  document.body.addEventListener('click', enableVideoSound, {once:true, passive:true});
+  document.body.addEventListener('touchstart', enableVideoSound, {once:true, passive:true});
+
+  // Остановка видео и появление кнопки через 13 секунд
+  video.addEventListener('loadedmetadata', () => {
+    setTimeout(() => {
+      video.pause();
+      btn.style.display = 'block';
+    }, 13000); // 13 секунд
+  });
+
+  // Автозапуск без повторения (если браузер позволяет)
+  video.play().catch(()=>{});
 </script>
 
 </body>
