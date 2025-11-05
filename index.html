@@ -12,10 +12,10 @@
     width: 100%;
     background: black;
     font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
   }
   .video-container {
     position: relative;
@@ -33,7 +33,7 @@
   }
   .portal-button {
     position: absolute;
-    bottom: -60px; /* кнопка снизу под видео */
+    bottom: -60px;
     left: 50%;
     transform: translateX(-50%);
     padding: 14px 40px;
@@ -56,8 +56,8 @@
 <body>
 
 <div class="video-container">
-  <video id="bg" autoplay playsinline>
-    <source src="oracle_clean.mp4" type="video/mp4">
+  <video id="bg" playsinline preload="auto">
+    <source src="5197261481606939449.mp4" type="video/mp4">
     Ваш браузер не поддерживает видео.
   </video>
   <a class="portal-button" href="https://t.me/GroqDreams_bot" target="_blank" rel="noopener noreferrer">
@@ -67,16 +67,8 @@
 
 <script>
   const video = document.getElementById('bg');
-  const button = document.querySelector('.portal-button');
-
-  // Видео играет один раз и останавливается
-  video.addEventListener('ended', () => {
-    video.pause(); // на всякий случай
-    button.style.display = 'block'; // кнопка остаётся видимой
-  });
-
-  // Убираем автозакрытие кнопки
-  button.style.display = 'block';
+  video.muted = false;
+  video.play().catch(()=>{}); // Включаем сразу видео с звуком при возможности
 </script>
 
 </body>
