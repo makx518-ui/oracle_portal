@@ -15,7 +15,7 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #0a0a1a;
+  background: radial-gradient(ellipse at center, #06061a 0%, #000010 100%);
   position: relative;
 }
 
@@ -63,7 +63,7 @@ video#bg {
   background: rgba(150,0,255,1);
 }
 
-/* Звезды на фоне */
+/* Мерцающие звёзды */
 .stars {
   position: absolute;
   top:0;
@@ -77,7 +77,7 @@ video#bg {
   position: absolute;
   width: 2px;
   height: 2px;
-  background: white;
+  background: #7ab6ff;
   border-radius: 50%;
   opacity: 0.8;
   animation: twinkle 2s infinite alternate;
@@ -94,7 +94,7 @@ video#bg {
 <div class="stars" id="stars"></div>
 
 <div class="video-container">
-  <video id="bg" muted preload="auto">
+  <video id="bg" muted preload="auto" controlslist="nodownload nofullscreen noremoteplayback">
     <source src="./5197261481606939449.mp4" type="video/mp4">
     Ваш браузер не поддерживает видео.
   </video>
@@ -110,7 +110,7 @@ video#bg {
   const starsContainer = document.getElementById('stars');
 
   // Создаем звезды
-  function createStars(count=50){
+  function createStars(count=60){
     for(let i=0;i<count;i++){
       const star = document.createElement('div');
       star.className = 'star';
@@ -123,7 +123,11 @@ video#bg {
   }
   createStars();
 
-  // Включаем звук при первом клике
+  // Полностью убираем любые субтитры
+  Array.from(video.querySelectorAll('track')).forEach(t => t.remove());
+  video.textTracks && Array.from(video.textTracks).forEach(track => track.mode = 'disabled');
+
+  // Включаем звук по первому клику
   function enableSound() {
     video.muted = false;
     video.play().catch(()=>{});
@@ -133,18 +137,14 @@ video#bg {
   document.body.addEventListener('click', enableSound, {once:true, passive:true});
   document.body.addEventListener('touchstart', enableSound, {once:true, passive:true});
 
-  // Ограничиваем видео и звук 13 секундами
+  // Ограничиваем длину видео до 13 секунд
   video.addEventListener('play', ()=>{
     setTimeout(()=>{
-      video.pause();        // останавливаем видео
-      video.currentTime = 0; // сбрасываем позицию
-      portalBtn.classList.add('show'); // показываем кнопку
-    }, 13000); // 13 секунд
+      video.pause();
+      video.currentTime = 0;
+      portalBtn.classList.add('show');
+    }, 13000);
   });
-
-  // Убираем субтитры (если они есть)
-  video.textTracks && Array.from(video.textTracks).forEach(track => track.mode = 'disabled');
-
 })();
 </script>
 
